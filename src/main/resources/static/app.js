@@ -99,6 +99,8 @@ async function crearCliente() {
     cargarClientes();
 }
 
+
+
 // ===================== DETALLE CLIENTE =====================
 
 async function verDetalleCliente(id) {
@@ -208,6 +210,114 @@ async function eliminarCliente(id) {
     cargarClientes();
 }
 
+// ===================== ALERTAS FLOTANTES =====================
+function mostrarConfirmacion() {
+    return new Promise((resolve) => {
+
+        const modal = document.getElementById("modalConfirm");
+        const btnOk = document.getElementById("btnConfirmar");
+        const btnCancel = document.getElementById("btnCancelar");
+
+        modal.classList.add("show");
+
+        // evitar múltiples clicks acumulados
+        btnOk.onclick = null;
+        btnCancel.onclick = null;
+
+        btnOk.onclick = () => {
+            modal.classList.remove("show");
+            resolve(true);
+        };
+
+        btnCancel.onclick = () => {
+            modal.classList.remove("show");
+            resolve(false);
+        };
+    });
+}
+
+function mostrarAlerta(mensaje, tipo = "success") {
+    const toast = document.getElementById("toast");
+
+    let icono = "";
+    let titulo = "";
+
+    if (tipo === "success") {
+        icono = "✅";
+        titulo = "Éxito";
+    }
+    if (tipo === "error") {
+        icono = "❌";
+        titulo = "Error";
+    }
+    if (tipo === "warning") {
+        icono = "⚠️";
+        titulo = "Advertencia";
+    }
+
+    toast.innerHTML = `
+        <div class="toast-icon">${icono}</div>
+        <div class="toast-content">
+            <div class="toast-title">${titulo}</div>
+            <div class="toast-message">${mensaje}</div>
+        </div>
+    `;
+
+    toast.classList.remove("success", "error", "warning", "show");
+    void toast.offsetWidth;
+
+    toast.classList.add(tipo);
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3500);
+}
+
+// ===================== DEUDA =====================
+
+async function crearDeuda() {
+    console.log("CLICK EN CREAR DEUDA");
+
+    const valor = document.getElementById("valorDeuda").value;
+    const descripcion = document.getElementById("descripcionDeuda").value;
+    const clienteId = document.getElementById("clienteSelect").value;
+
+    if (!valor || !descripcion || !clienteId) {
+        mostrarAlerta("Completa todos los campos", "warning");
+        return;
+    }
+
+    // 🔥 MOSTRAR CONFIRMACIÓN ANTES DE GUARDAR
+    const confirmado = await mostrarConfirmacion();
+    if (!confirmado) return; // Si cancela, no hace nada
+
+    try {
+        await fetch(API_DEUDAS, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                clienteId: parseInt(clienteId),
+                totalDeuda: parseInt(valor),
+                saldoActual: parseInt(valor),
+                descripcion: descripcion,
+                pagada: false
+            })
+        });
+
+        mostrarAlerta("Deuda guardada exitosamente", "success");
+
+        document.getElementById("valorDeuda").value = "";
+        document.getElementById("descripcionDeuda").value = "";
+
+        verDetalleCliente(clienteId);
+
+    } catch (error) {
+        console.error("Error creando deuda:", error);
+        mostrarAlerta("Error al guardar la deuda", "error");
+    }
+}
+
 // ===================== INICIO =====================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -215,4 +325,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("btnGuardar")
         .addEventListener("click", crearCliente);
+
+    // 🔥 FALTABA ESTO
+    document.getElementById("btnCrearDeuda")
+        .addEventListener("click", crearDeuda);
 });
