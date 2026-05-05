@@ -8,48 +8,52 @@
 <body>
 
 <div class="container">
-    <h1>Control de Fiados (YIYA)</h1>
+
+    <h1>Control de Fiados</h1>
+
+    <!-- 🔍 FILTRO -->
     <input type="text" id="filtroClientes" placeholder="Buscar cliente...">
 
+    <!-- ================= CLIENTES ================= -->
     <h2>Clientes</h2>
+
     <div class="form-group">
         <input type="text" id="nombre" placeholder="Nombre">
         <input type="text" id="telefono" placeholder="Teléfono">
         <input type="number" id="numero_cuaderno" placeholder="Número cuaderno">
     </div>
+
     <button id="btnGuardar">Guardar Cliente</button>
+
     <ul id="listaClientes"></ul>
+
     <hr>
 
+    <!-- ================= DEUDAS ================= -->
     <h2>Registrar Deuda</h2>
+
     <div class="form-group">
         <input type="number" id="valorDeuda" placeholder="Valor">
         <input type="text" id="descripcionDeuda" placeholder="Descripción">
     </div>
+
     <label>Seleccionar cliente:</label>
     <select id="clienteSelect"></select>
+
     <button id="btnCrearDeuda">Guardar Deuda</button>
+
     <hr>
 
+    <!-- ================= DETALLE ================= -->
     <h2>Detalle del Cliente</h2>
+
     <h3 id="nombreCliente">Selecciona un cliente</h3>
+
     <ul id="listaDeudas"></ul>
+
 </div>
 
-<div id="toast" class="toast"></div>
-
-<div id="modalConfirm" class="modal">
-    <div class="modal-content">
-        <h3>Confirmar acción</h3>
-        <p>¿Estás seguro de registrar esta deuda?</p>
-        <div class="modal-buttons">
-            <button id="btnCancelar" class="btn-cancelar">Cancelar</button>
-            <button id="btnConfirmar" class="btn-confirmar">Sí, guardar</button>
-        </div>
-    </div>
-</div>
-
-<script src="/app.js" defer></script>
+<script src="/app.js"></script>
 
 </body>
 </html>
