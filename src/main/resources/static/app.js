@@ -99,6 +99,8 @@ async function crearCliente() {
     cargarClientes();
 }
 
+
+
 // ===================== DETALLE CLIENTE =====================
 
 async function verDetalleCliente(id) {
@@ -119,7 +121,11 @@ async function verDetalleCliente(id) {
             return;
         }
 
+        // 🔥 TOTAL GENERAL
+        let totalSaldo = 0;
+
         deudas.forEach(d => {
+            totalSaldo += d.saldoActual;
 
             const li = document.createElement("li");
 
@@ -135,49 +141,57 @@ async function verDetalleCliente(id) {
 
                     <div>📅 ${formatearFecha(d.fecha)}</div>
 
-                    <div id="estado-${d.id}">
+                    <div>
                         ${d.pagada ? "✔ PAGADA" : "🔴 PENDIENTE"}
                     </div>
 
-                    ${!d.pagada ? `
-                        <div class="abono-box">
-                            <input type="number" id="abono-${d.id}" placeholder="Abono">
-                            <button class="btnAbonar" data-id="${d.id}">
-                                Abonar
-                            </button>
-                        </div>
-                    ` : ""}
                 </div>
             `;
 
             lista.appendChild(li);
         });
 
-        // ===================== EVENTOS ABONO =====================
-        document.querySelectorAll(".btnAbonar").forEach(btn => {
-            btn.addEventListener("click", async (e) => {
+        // 🔥 BLOQUE DE ABONO GLOBAL (UNO SOLO)
+        const divAbono = document.createElement("div");
 
-                const idDeuda = e.target.dataset.id;
-                const input = document.getElementById(`abono-${idDeuda}`);
-                const valor = parseInt(input.value);
+        divAbono.innerHTML = `
+            <div class="deuda-card" style="margin-top:15px;">
+                <h3>Total deuda del cliente: ${totalSaldo}</h3>
 
-                if (!valor || valor <= 0) {
-                    alert("Ingresa un valor válido");
-                    return;
-                }
+                <input type="number" id="abonoGlobal" placeholder="Abonar a toda la deuda">
 
-                await fetch(`${API_DEUDAS}/abonar/${idDeuda}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ abono: valor })
-                });
+                <button id="btnAbonarGlobal" class="btnAbonar">
+                    Abonar todo
+                </button>
+            </div>
+        `;
 
-                verDetalleCliente(id);
+        lista.appendChild(divAbono);
+
+        // 🔥 EVENTO ABONO GLOBAL
+        document.getElementById("btnAbonarGlobal").addEventListener("click", async () => {
+
+            const valor = parseInt(document.getElementById("abonoGlobal").value);
+
+            if (!valor || valor <= 0) {
+                mostrarAlerta("Ingresa un valor válido", "warning");
+                return;
+            }
+
+            await fetch(`${API_DEUDAS}/abonar-cliente/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ abono: valor })
             });
+
+            mostrarAlerta("Abono aplicado a toda la deuda", "success");
+
+            verDetalleCliente(id);
         });
 
     } catch (error) {
         console.error("Error detalle:", error);
+        mostrarAlerta("Error cargando detalle del cliente", "error");
     }
 }
 
@@ -208,6 +222,114 @@ async function eliminarCliente(id) {
     cargarClientes();
 }
 
+// ===================== ALERTAS FLOTANTES =====================
+function mostrarConfirmacion() {
+    return new Promise((resolve) => {
+
+        const modal = document.getElementById("modalConfirm");
+        const btnOk = document.getElementById("btnConfirmar");
+        const btnCancel = document.getElementById("btnCancelar");
+
+        modal.classList.add("show");
+
+        // evitar múltiples clicks acumulados
+        btnOk.onclick = null;
+        btnCancel.onclick = null;
+
+        btnOk.onclick = () => {
+            modal.classList.remove("show");
+            resolve(true);
+        };
+
+        btnCancel.onclick = () => {
+            modal.classList.remove("show");
+            resolve(false);
+        };
+    });
+}
+
+function mostrarAlerta(mensaje, tipo = "success") {
+    const toast = document.getElementById("toast");
+
+    let icono = "";
+    let titulo = "";
+
+    if (tipo === "success") {
+        icono = "✅";
+        titulo = "Éxito";
+    }
+    if (tipo === "error") {
+        icono = "❌";
+        titulo = "Error";
+    }
+    if (tipo === "warning") {
+        icono = "⚠️";
+        titulo = "Advertencia";
+    }
+
+    toast.innerHTML = `
+        <div class="toast-icon">${icono}</div>
+        <div class="toast-content">
+            <div class="toast-title">${titulo}</div>
+            <div class="toast-message">${mensaje}</div>
+        </div>
+    `;
+
+    toast.classList.remove("success", "error", "warning", "show");
+    void toast.offsetWidth;
+
+    toast.classList.add(tipo);
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3500);
+}
+
+// ===================== DEUDA =====================
+
+async function crearDeuda() {
+    console.log("CLICK EN CREAR DEUDA");
+
+    const valor = document.getElementById("valorDeuda").value;
+    const descripcion = document.getElementById("descripcionDeuda").value;
+    const clienteId = document.getElementById("clienteSelect").value;
+
+    if (!valor || !descripcion || !clienteId) {
+        mostrarAlerta("Completa todos los campos", "warning");
+        return;
+    }
+
+    // 🔥 MOSTRAR CONFIRMACIÓN ANTES DE GUARDAR
+    const confirmado = await mostrarConfirmacion();
+    if (!confirmado) return; // Si cancela, no hace nada
+
+    try {
+        await fetch(API_DEUDAS, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                clienteId: parseInt(clienteId),
+                totalDeuda: parseInt(valor),
+                saldoActual: parseInt(valor),
+                descripcion: descripcion,
+                pagada: false
+            })
+        });
+
+        mostrarAlerta("Deuda guardada exitosamente", "success");
+
+        document.getElementById("valorDeuda").value = "";
+        document.getElementById("descripcionDeuda").value = "";
+
+        verDetalleCliente(clienteId);
+
+    } catch (error) {
+        console.error("Error creando deuda:", error);
+        mostrarAlerta("Error al guardar la deuda", "error");
+    }
+}
+
 // ===================== INICIO =====================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -215,4 +337,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("btnGuardar")
         .addEventListener("click", crearCliente);
+
+    // 🔥 FALTABA ESTO
+    document.getElementById("btnCrearDeuda")
+        .addEventListener("click", crearDeuda);
 });

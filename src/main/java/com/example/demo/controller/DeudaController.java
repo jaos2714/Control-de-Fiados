@@ -54,6 +54,39 @@ public class DeudaController {
         return repo.save(deuda);
     }
 
+    @PutMapping("/abonar-cliente/{clienteId}")
+    public String abonarCliente(
+            @PathVariable Integer clienteId,
+            @RequestBody DeudaAbonoRequest request) {
+
+        List<Deuda> deudas = repo.findByClienteId(clienteId);
+
+        int abono = request.getAbono();
+
+        for (Deuda d : deudas) {
+
+            if (d.getSaldoActual() > 0 && abono > 0) {
+
+                int saldo = d.getSaldoActual() - abono;
+
+                if (saldo < 0) {
+                    abono = Math.abs(saldo);
+                    d.setSaldoActual(0);
+                    d.setPagada(true);
+                } else {
+                    d.setSaldoActual(saldo);
+                    abono = 0;
+                }
+
+                repo.save(d);
+
+                if (abono == 0) break;
+            }
+        }
+
+        return "Abono aplicado correctamente";
+    }
+
     @DeleteMapping("/{id}")
     public void eliminar(@PathVariable Integer id) { repo.deleteById(id); }
 }
