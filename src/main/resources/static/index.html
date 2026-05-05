@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Control de Fiados</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Control de Fiados</h1>
+
+    <!-- 🔍 FILTRO -->
+    <input type="text" id="filtroClientes" placeholder="Buscar cliente...">
+
+    <!-- ================= CLIENTES ================= -->
+    <h2>Clientes</h2>
+
+    <div class="form-group">
+        <input type="text" id="nombre" placeholder="Nombre">
+        <input type="text" id="telefono" placeholder="Teléfono">
+        <input type="number" id="numero_cuaderno" placeholder="Número cuaderno">
+    </div>
+
+    <button id="btnGuardar">Guardar Cliente</button>
+
+    <ul id="listaClientes"></ul>
+
+    <hr>
+
+    <!-- ================= DEUDAS ================= -->
+    <h2>Registrar Deuda</h2>
+
+    <div class="form-group">
+        <input type="number" id="valorDeuda" placeholder="Valor">
+        <input type="text" id="descripcionDeuda" placeholder="Descripción">
+    </div>
+
+    <label>Seleccionar cliente:</label>
+    <select id="clienteSelect"></select>
+
+    <button id="btnCrearDeuda">Guardar Deuda</button>
+
+    <hr>
+
+    <!-- ================= DETALLE ================= -->
+    <h2>Detalle del Cliente</h2>
+
+    <h3 id="nombreCliente">Selecciona un cliente</h3>
+
+    <ul id="listaDeudas"></ul>
+
+</div>
+
+<script src="/app.js"></script>
+
+</body>
+</html>
