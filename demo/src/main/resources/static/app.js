@@ -7,15 +7,22 @@ let clientesGlobal = [];
 
 // ===================== CLIENTES =====================
 
+let paginaActual = 1;
+const CLIENTES_POR_PAGINA = 4;
+
 async function cargarClientes() {
     try {
         const res = await fetch(API);
         const data = await res.json();
 
-        clientesGlobal = data;
+        // 🔤 ORDENAR ALFABÉTICAMENTE
+        clientesGlobal = data.sort((a, b) =>
+            a.nombre.localeCompare(b.nombre, "es")
+        );
 
-        mostrarClientes(data);
-        cargarClientesSelect(); // 🔥 SIEMPRE ACTUALIZA SELECT
+        paginaActual = 1;
+        mostrarClientes(clientesGlobal);
+        cargarClientesSelect();
 
     } catch (error) {
         console.error("Error cargando clientes:", error);
@@ -26,7 +33,15 @@ function mostrarClientes(lista) {
     const cont = document.getElementById("listaClientes");
     cont.innerHTML = "";
 
-    lista.forEach(c => {
+    // 📄 CALCULAR PÁGINA
+    const total = lista.length;
+    const totalPaginas = Math.ceil(total / CLIENTES_POR_PAGINA);
+    const inicio = (paginaActual - 1) * CLIENTES_POR_PAGINA;
+    const fin = inicio + CLIENTES_POR_PAGINA;
+    const paginados = lista.slice(inicio, fin);
+
+    // RENDERIZAR CLIENTES
+    paginados.forEach(c => {
         const li = document.createElement("li");
 
         li.innerHTML = `
@@ -46,6 +61,49 @@ function mostrarClientes(lista) {
 
         cont.appendChild(li);
     });
+
+    // 📄 CONTROLES DE PAGINACIÓN
+    const paginacion = document.createElement("div");
+    paginacion.classList.add("paginacion");
+
+    paginacion.innerHTML = `
+        <button id="btnAnterior" ${paginaActual === 1 ? "disabled" : ""}>◀ Anterior</button>
+        <span>Página ${paginaActual} de ${totalPaginas}</span>
+        <button id="btnSiguiente" ${paginaActual === totalPaginas ? "disabled" : ""}>Siguiente ▶</button>
+    `;
+
+    cont.appendChild(paginacion);
+
+    document.getElementById("btnAnterior").addEventListener("click", () => {
+        if (paginaActual > 1) {
+            paginaActual--;
+            mostrarClientes(lista);
+        }
+    });
+
+    document.getElementById("btnSiguiente").addEventListener("click", () => {
+        if (paginaActual < totalPaginas) {
+            paginaActual++;
+            mostrarClientes(lista);
+        }
+    });
+}
+
+// ===================== FILTRAR POR CLIENTE =====================
+
+document.getElementById("filtroClientes").addEventListener("input", filtrarClientes);
+
+function filtrarClientes() {
+    const texto = document.getElementById("filtroClientes").value.toLowerCase();
+
+    const filtrados = clientesGlobal.filter(c =>
+        c.nombre.toLowerCase().includes(texto) ||
+        c.telefono.toLowerCase().includes(texto) ||
+        String(c.numeroCuaderno).includes(texto)
+    );
+
+    paginaActual = 1; // 🔥 resetear página al filtrar
+    mostrarClientes(filtrados);
 }
 
 // ===================== SELECT CLIENTES =====================
@@ -88,7 +146,8 @@ async function crearCliente() {
         body: JSON.stringify({
             nombre,
             telefono,
-            numeroCuaderno: parseInt(numeroCuaderno)
+            numeroCuaderno: numeroCuaderno,
+
         })
     });
 
