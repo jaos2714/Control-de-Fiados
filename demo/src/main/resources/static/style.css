@@ -1,0 +1,305 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+/* INPUTS */
+input, select {
+    padding: 12px;
+    margin: 6px 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* AGRUPACIÓN */
+.form-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.form-group input {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* BOTONES */
+button {
+    padding: 12px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #1f6fa5;
+}
+
+/* CLIENTES */
+#listaClientes {
+    list-style: none;
+    padding: 0;
+}
+
+#listaClientes li {
+    background: #fff;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+#listaClientes li:hover {
+    background: #f1f5f9;
+}
+
+/* DEUDAS */
+.deuda-card {
+    background: white;
+    border-left: 5px solid #3498db;
+    padding: 15px;
+    margin: 12px 0;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.deuda-top {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+.descripcion {
+    margin-top: 6px;
+    color: #555;
+}
+
+.abono-box {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.abono-box input {
+    flex: 1;
+}
+
+.btnAbonar {
+    background: #2ecc71;
+}
+
+.btnAbonar:hover {
+    background: #27ae60;
+}
+
+.pagada {
+    margin-top: 10px;
+    color: green;
+    font-weight: bold;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+
+    .form-group {
+        flex-direction: column;
+    }
+
+    #listaClientes li {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .deuda-top {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+/* ================= TOAST PROFESIONAL ================= */
+
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 320px;
+    padding: 16px;
+    border-radius: 14px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    transition: all 0.4s ease;
+
+    z-index: 9999;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    pointer-events: none;
+}
+
+/* visible */
+.toast.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* estilos por tipo */
+.toast.success {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.toast.warning {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+/* icono */
+.toast-icon {
+    font-size: 20px;
+}
+
+/* contenido */
+.toast-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.toast-title {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.toast-message {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* ================= MODAL PROFESIONAL ================= */
+
+/* ================= MODAL ================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+
+    display: none; /* 🔥 oculto de verdad */
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 99999;
+}
+
+/* mostrar */
+.modal.show {
+    display: flex;
+}
+
+/* caja */
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    animation: modalFadeIn 0.25s ease;
+}
+
+/* animación */
+@keyframes modalFadeIn {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* botones */
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-cancelar {
+    flex: 1;
+    background: #bdc3c7;
+}
+
+.btn-confirmar {
+    flex: 1;
+    background: #2ecc71;
+}
+
+/* ===== PAGINACIÓN ===== */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 8px 0;
+}
+
+.paginacion button {
+    padding: 8px 16px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.paginacion button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.paginacion span {
+    font-size: 14px;
+    color: #555;
+}
