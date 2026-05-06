@@ -1,7 +1,7 @@
 console.log("JS cargado correctamente");
 
-const API = "http://localhost:8081/clientes";
-const API_DEUDAS = "http://localhost:8081/deudas";
+const API = "https://grain-disaster-laxative.ngrok-free.dev/clientes";
+const API_DEUDAS = "https://grain-disaster-laxative.ngrok-free.dev/deudas";
 
 let clientesGlobal = [];
 
