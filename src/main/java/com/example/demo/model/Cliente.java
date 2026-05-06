@@ -14,7 +14,7 @@ public class Cliente {
     private String telefono;
 
     @Column(name = "numero_cuaderno")
-    private Integer numeroCuaderno;
+    private String numeroCuaderno;
 
     // Getters y Setters
     public Integer getId() { return id; }
@@ -26,6 +26,6 @@ public class Cliente {
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
 
-    public Integer getNumeroCuaderno() { return numeroCuaderno; }
-    public void setNumeroCuaderno(Integer numeroCuaderno) { this.numeroCuaderno = numeroCuaderno; }
+    public String getNumeroCuaderno() { return numeroCuaderno; }
+    public void setNumeroCuaderno(String numeroCuaderno) { this.numeroCuaderno = numeroCuaderno; }
 }
